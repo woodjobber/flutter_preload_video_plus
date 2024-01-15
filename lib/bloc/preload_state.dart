@@ -2,9 +2,9 @@ part of 'preload_bloc.dart';
 
 @Freezed(makeCollectionsUnmodifiable: false)
 class PreloadState with _$PreloadState {
-   factory PreloadState({
+  factory PreloadState({
     required List<String> urls,
-    required Map<int, VideoPlayerController> controllers,
+    required Map<int, PreloadControllerItem> controllers,
     required int focusedIndex,
     required int reloadCounter,
     required bool isLoading,

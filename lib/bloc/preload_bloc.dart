@@ -2,12 +2,15 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
+import 'package:cached_chewie_plus/cached_chewie_plus.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_preload_videos/bloc/preload_controller_item.dart';
 import 'package:flutter_preload_videos/service/api_service.dart';
 import 'package:flutter_preload_videos/core/constants.dart';
 import 'package:flutter_preload_videos/main.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
-import 'package:video_player/video_player.dart';
 
 part 'preload_bloc.freezed.dart';
 part 'preload_event.dart';
@@ -39,6 +42,8 @@ class PreloadBloc extends Bloc<PreloadEvent, PreloadState> {
         /// Initialize 2nd video
         await _initializeControllerAtIndex(1);
 
+        /// Initialize 3nd video
+        await _initializeControllerAtIndex(2);
         emit(state.copyWith(reloadCounter: state.reloadCounter + 1));
       },
       // initialize: (e) async* {},
@@ -46,10 +51,12 @@ class PreloadBloc extends Bloc<PreloadEvent, PreloadState> {
         /// Condition to fetch new videos
         final bool shouldFetch = (e.index + kPreloadLimit) % kNextLimit == 0 &&
             state.urls.length == e.index + kPreloadLimit;
-
         if (shouldFetch) {
+          log('start fetch from: ${e.index}');
           createIsolate(e.index);
         }
+        if (e.index == state.focusedIndex) return;
+        final newState = state.copyWith(focusedIndex: e.index);
 
         /// Next / Prev video decider
         if (e.index > state.focusedIndex) {
@@ -58,7 +65,7 @@ class PreloadBloc extends Bloc<PreloadEvent, PreloadState> {
           _playPrevious(e.index);
         }
 
-        emit(state.copyWith(focusedIndex: e.index));
+        emit(newState);
       },
       updateUrls: (e) {
         /// Add new urls to current urls
@@ -78,41 +85,87 @@ class PreloadBloc extends Bloc<PreloadEvent, PreloadState> {
     /// Stop [index - 1] controller
     _stopControllerAtIndex(index - 1);
 
+    /// Stop [index - 2] controller
+    _stopControllerAtIndex(index - 2);
+
     /// Dispose [index - 2] controller
-    _disposeControllerAtIndex(index - 2);
+    _disposeControllerAtIndex(index - 3);
 
     /// Play current video (already initialized)
     _playControllerAtIndex(index);
 
     /// Initialize [index + 1] controller
     _initializeControllerAtIndex(index + 1);
+
+    ///Initialize [index + 2] controller
+    _initializeControllerAtIndex(index + 2);
   }
 
   void _playPrevious(int index) {
     /// Stop [index + 1] controller
     _stopControllerAtIndex(index + 1);
+    _stopControllerAtIndex(index + 2);
 
     /// Dispose [index + 2] controller
-    _disposeControllerAtIndex(index + 2);
+    _disposeControllerAtIndex(index + 3);
 
     /// Play current video (already initialized)
     _playControllerAtIndex(index);
 
     /// Initialize [index - 1] controller
     _initializeControllerAtIndex(index - 1);
+
+    /// Initialize [index - 2] controller
+    _initializeControllerAtIndex(index - 2);
   }
 
   Future _initializeControllerAtIndex(int index) async {
     if (state.urls.length > index && index >= 0) {
+      final oldControllerItem = state.controllers[index];
+      if (oldControllerItem != null &&
+          oldControllerItem.isInitialized &&
+          !oldControllerItem.disposed &&
+          !oldControllerItem.willDisposed) {
+        return;
+      }
+
       /// Create new controller
-      final VideoPlayerController _controller =
-          VideoPlayerController.network(state.urls[index]);
+      final CachedVideoPlayerController _controller =
+          CachedVideoPlayerController.networkUrl(state.urls[index].toUri);
+      final chewieController = ChewieController(
+        videoPlayerController: _controller,
+        autoPlay: false,
+        looping: true,
+        autoInitialize: false,
+        showControls: true,
+        showControlsOnInitialize: false,
+        hideControlsTimer: Duration(seconds: 1),
+      );
+
+      final controllerItem = PreloadControllerItem(
+        videoPlayerController: _controller,
+        chewieController: chewieController,
+        willDisposed: false,
+        disposed: false,
+        isInitializing: true,
+      );
 
       /// Add to [controllers] list
-      state.controllers[index] = _controller;
+      state.controllers[index] = controllerItem;
 
       /// Initialize
       await _controller.initialize();
+      if (controllerItem.shouldPlayAfterInitialized &&
+          state.focusedIndex == index &&
+          !_controller.value.isPlaying) {
+        log('🚀🚀🚀 Try Playing $index');
+        _playControllerAtIndex(index);
+      }
+      controllerItem.copySelfWith(
+        isInitialized: _controller.isInitialized,
+        isInitializing: false,
+        shouldPlayAfterInitialized: false,
+      );
 
       log('🚀🚀🚀 INITIALIZED $index');
     }
@@ -121,43 +174,80 @@ class PreloadBloc extends Bloc<PreloadEvent, PreloadState> {
   void _playControllerAtIndex(int index) {
     if (state.urls.length > index && index >= 0) {
       /// Get controller at [index]
-      final VideoPlayerController _controller = state.controllers[index]!;
+      final CachedVideoPlayerController _controller =
+          state.controllers[index]!.videoPlayerController;
+      state.controllers[index]!.copySelfWith(
+        willDisposed: false,
+        disposed: false,
+        isInitialized: _controller.isInitialized,
+        isInitializing: false,
+      );
 
-      /// Play controller
-      _controller.play();
+      _controller.setLooping(true);
 
-      log('🚀🚀🚀 PLAYING $index');
+      if (_controller.isInitialized) {
+        state.controllers[index]!
+            .copySelfWith(shouldPlayAfterInitialized: false);
+
+        /// Play controller
+        if (!_controller.value.isPlaying) {
+          _controller.play();
+        }
+
+        log('🚀🚀🚀 PLAYING $index');
+      } else {
+        state.controllers[index]!
+            .copySelfWith(shouldPlayAfterInitialized: true);
+        log('🚀🚀🚀 isInitializing $index');
+      }
     }
   }
 
   void _stopControllerAtIndex(int index) {
     if (state.urls.length > index && index >= 0) {
       /// Get controller at [index]
-      final VideoPlayerController _controller = state.controllers[index]!;
+      final CachedVideoPlayerController _controller =
+          state.controllers[index]!.videoPlayerController;
 
       /// Pause
       _controller.pause();
 
-      /// Reset postiton to beginning
+      /// Reset position to beginning
       _controller.seekTo(const Duration());
 
       log('🚀🚀🚀 STOPPED $index');
     }
   }
 
-  void _disposeControllerAtIndex(int index) {
+  void _disposeControllerAtIndex(int index) async {
     if (state.urls.length > index && index >= 0) {
+      final controllerItem = state.controllers[index];
+
       /// Get controller at [index]
-      final VideoPlayerController? _controller = state.controllers[index];
+      final CachedVideoPlayerController? _controller =
+          controllerItem?.videoPlayerController;
+      controllerItem?.copySelfWith(willDisposed: true);
 
       /// Dispose controller
-      _controller?.dispose();
+      await _controller?.dispose();
+      controllerItem?.chewieController.dispose();
+      controllerItem?.copySelfWith(disposed: true);
 
-      if (_controller != null) {
-        state.controllers.remove(_controller);
+      if (controllerItem != null) {
+        state.controllers.remove(controllerItem);
       }
 
       log('🚀🚀🚀 DISPOSED $index');
     }
+  }
+}
+
+extension UriString on String {
+  Uri get toUri => Uri.parse(this);
+}
+
+extension CachedVideoControllerExt on CachedVideoPlayerController {
+  bool get isInitialized {
+    return this.value.isInitialized;
   }
 }

@@ -1,7 +1,7 @@
-// Customize
+// Customize 预加载限制触发
 const int kPreloadLimit = 3;
 
-// Customize
+// Customize 下一页数量
 const int kNextLimit = 5;
 
 // For better UX, latency should be minimum.
