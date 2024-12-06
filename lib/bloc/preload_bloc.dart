@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
+
 import 'package:cached_chewie_plus/cached_chewie_plus.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+
 import 'package:flutter_preload_videos/bloc/preload_controller_item.dart';
 import 'package:flutter_preload_videos/service/api_service.dart';
 import 'package:flutter_preload_videos/core/constants.dart';
@@ -73,7 +75,7 @@ class PreloadBloc extends Bloc<PreloadEvent, PreloadState> {
 
         /// Initialize new url
         _initializeControllerAtIndex(state.focusedIndex + 1);
-
+        _initializeControllerAtIndex(state.focusedIndex + 2);
         emit(state.copyWith(
             reloadCounter: state.reloadCounter + 1, isLoading: false));
         log('🚀🚀🚀 NEW VIDEOS ADDED');
@@ -137,9 +139,12 @@ class PreloadBloc extends Bloc<PreloadEvent, PreloadState> {
         autoPlay: false,
         looping: true,
         autoInitialize: false,
-        showControls: true,
+        showControls: false,
+        showOptions: true,
         showControlsOnInitialize: false,
         hideControlsTimer: Duration(seconds: 1),
+        customControls: SizedBox.shrink(),
+        allowedScreenSleep: false,
       );
 
       final controllerItem = PreloadControllerItem(
@@ -249,5 +254,64 @@ extension UriString on String {
 extension CachedVideoControllerExt on CachedVideoPlayerController {
   bool get isInitialized {
     return this.value.isInitialized;
+  }
+}
+
+class CounterCubit extends Cubit<int> {
+  CounterCubit() : super(0);
+  void increment() => emit(state + 1);
+
+  /// 状态即将变化
+  @override
+  void onChange(Change<int> change) {
+    // TODO: implement onChange
+    super.onChange(change);
+    print(change);
+  }
+}
+
+sealed class CounterEvent {
+  int count;
+  CounterEvent({
+    this.count = 0,
+  });
+}
+
+final class CounterIncrementPressed extends CounterEvent {
+  CounterIncrementPressed({super.count});
+}
+
+class CounterBloc extends Bloc<CounterEvent, int> {
+  CounterBloc() : super(0) {
+    on<CounterIncrementPressed>(
+      (event, emit) => emit(state + 1),
+      transformer: sequential(),
+    );
+  }
+  @override
+  void onEvent(CounterEvent event) {
+    // TODO: implement onEvent
+    super.onEvent(event);
+    print(event);
+  }
+
+  @override
+  void onChange(Change<int> change) {
+    // TODO: implement onChange
+    super.onChange(change);
+    print(change);
+  }
+
+  @override
+  void onTransition(Transition<CounterEvent, int> transition) {
+    // TODO: implement onTransition
+    super.onTransition(transition);
+    print(transition);
+  }
+
+  @override
+  void onError(Object error, StackTrace stackTrace) {
+    // TODO: implement onError
+    super.onError(error, stackTrace);
   }
 }
