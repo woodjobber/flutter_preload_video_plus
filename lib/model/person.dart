@@ -81,6 +81,7 @@ final class C {}
 sealed class D {
   // 必须得有一个 构造函数，子类才能被实例化 否则，no generative constructors (没有 生成构造函数 Generative constructors)
   // 验证： 注释掉 D._()，看D2提示错误信息
+  // 构造器类型：Generative,Default（是一个生成构造器且没有参数和名称）,Named,Constant,Factory,Redirecting.
   D._();
   factory D() = D1;
 }
