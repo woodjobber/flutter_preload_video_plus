@@ -313,5 +313,20 @@ class CounterBloc extends Bloc<CounterEvent, int> {
   void onError(Object error, StackTrace stackTrace) {
     // TODO: implement onError
     super.onError(error, stackTrace);
+    StaticCls();
   }
+}
+
+abstract class StaticCls {
+  static StaticCls init() {
+    return StaticClsImp();
+  }
+
+  factory StaticCls() {
+    return StaticClsImp();
+  }
+}
+
+class StaticClsImp implements StaticCls {
+  const StaticClsImp();
 }

@@ -48,3 +48,45 @@ class MyModel with _$MyModel {
   factory MyModel.fromJson(Map<String, dynamic> json) =>
       _$MyModelFromJson(json);
 }
+
+/// 类修饰符 base
+///
+/// extends 能被使用，implements 不能
+///
+base class A {
+  void a() {}
+}
+
+/// 必须标记： sealed or final or base
+sealed class A1 extends A {}
+
+/// 类修饰符 interface
+///
+/// extends 不能被使用，implements 能
+///
+interface class B {}
+
+/// final
+///
+/// 不能被 extends,implements
+///
+final class C {}
+
+/// sealed
+///
+/// 自身不能被实例.隐式的抽象类型
+///
+/// 适应 extends,implements
+///
+sealed class D {
+  // 必须得有一个 构造函数，子类才能被实例化 否则，no generative constructors (没有 生成构造函数 Generative constructors)
+  // 验证： 注释掉 D._()，看D2提示错误信息
+  D._();
+  factory D() = D1;
+}
+
+class D1 implements D {}
+
+class D2 extends D {
+  D2() : super._();
+}
