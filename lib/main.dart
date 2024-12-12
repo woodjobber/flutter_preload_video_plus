@@ -18,6 +18,7 @@ void main() async {
   configureInjection(Environment.prod);
   runApp(MyApp());
   Client().method();
+  A().func();
 }
 
 /// Isolate to fetch videos in the background so that the video experience is not disturbed.
@@ -168,13 +169,48 @@ mixin MyMixin2 on Super {
   }
 }
 
+/// MySuper-MySuper/MyMixin1-MySuper/Mixin1/MyMixin2-Client
+/// 打印顺序: Client0->MySuper->MyMixin1->MyMin2->Client
+///
 class Client extends MySuper with MyMixin1, MyMixin2 {
   @override
   void method() {
+    print('Client0');
     super.method();
     print('Client');
   }
 }
+
+class S {
+  void func() {
+    print('S');
+  }
+}
+
+mixin MA on S {
+  @override
+  void func() {
+    log();
+    print('MA');
+  }
+
+  void log() {
+    print('log MA');
+  }
+}
+
+mixin MB on S {
+  void func() {
+    log();
+    print('MB');
+  }
+
+  void log() {
+    print('log MB');
+  }
+}
+
+class A extends S with MA, MB {}
 
 Future createIsolate2() async {
   /// Where I listen to the message from Mike's port

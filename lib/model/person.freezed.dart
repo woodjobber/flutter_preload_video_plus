@@ -15,27 +15,71 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 Person _$PersonFromJson(Map<String, dynamic> json) {
-  return _Person.fromJson(json);
+  switch (json['runtimeType']) {
+    case 'default':
+      return _Person.fromJson(json);
+    case 'runner':
+      return _Runner.fromJson(json);
+
+    default:
+      throw CheckedFromJsonException(json, 'runtimeType', 'Person',
+          'Invalid union type "${json['runtimeType']}"!');
+  }
 }
 
 /// @nodoc
 mixin _$Person {
-  String get name => throw _privateConstructorUsedError;
-  int get age => throw _privateConstructorUsedError;
-  List<String> get books => throw _privateConstructorUsedError;
-  List<Student> get students => throw _privateConstructorUsedError;
-
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String name, int age, List<String> books, List<Student> students)
+        $default, {
+    required TResult Function() runner,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String name, int age, List<String> books, List<Student> students)?
+        $default, {
+    TResult? Function()? runner,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String name, int age, List<String> books, List<Student> students)?
+        $default, {
+    TResult Function()? runner,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_Person value) $default, {
+    required TResult Function(_Runner value) runner,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_Person value)? $default, {
+    TResult? Function(_Runner value)? runner,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_Person value)? $default, {
+    TResult Function(_Runner value)? runner,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
-  $PersonCopyWith<Person> get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $PersonCopyWith<$Res> {
   factory $PersonCopyWith(Person value, $Res Function(Person) then) =
       _$PersonCopyWithImpl<$Res, Person>;
-  @useResult
-  $Res call({String name, int age, List<String> books, List<Student> students});
 }
 
 /// @nodoc
@@ -47,42 +91,13 @@ class _$PersonCopyWithImpl<$Res, $Val extends Person>
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? age = null,
-    Object? books = null,
-    Object? students = null,
-  }) {
-    return _then(_value.copyWith(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      age: null == age
-          ? _value.age
-          : age // ignore: cast_nullable_to_non_nullable
-              as int,
-      books: null == books
-          ? _value.books
-          : books // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      students: null == students
-          ? _value.students
-          : students // ignore: cast_nullable_to_non_nullable
-              as List<Student>,
-    ) as $Val);
-  }
 }
 
 /// @nodoc
-abstract class _$$PersonImplCopyWith<$Res> implements $PersonCopyWith<$Res> {
+abstract class _$$PersonImplCopyWith<$Res> {
   factory _$$PersonImplCopyWith(
           _$PersonImpl value, $Res Function(_$PersonImpl) then) =
       __$$PersonImplCopyWithImpl<$Res>;
-  @override
   @useResult
   $Res call({String name, int age, List<String> books, List<Student> students});
 }
@@ -131,9 +146,11 @@ class _$PersonImpl extends _Person with DiagnosticableTreeMixin {
       {required this.name,
       required this.age,
       required this.books,
-      required this.students})
+      required this.students,
+      final String? $type})
       : assert(name.isNotEmpty, 'name cannot be empty'),
         assert(age >= 0, 'age cannot < 0'),
+        $type = $type ?? 'default',
         super._();
 
   factory _$PersonImpl.fromJson(Map<String, dynamic> json) =>
@@ -147,6 +164,9 @@ class _$PersonImpl extends _Person with DiagnosticableTreeMixin {
   final List<String> books;
   @override
   final List<Student> students;
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -191,6 +211,74 @@ class _$PersonImpl extends _Person with DiagnosticableTreeMixin {
       __$$PersonImplCopyWithImpl<_$PersonImpl>(this, _$identity);
 
   @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String name, int age, List<String> books, List<Student> students)
+        $default, {
+    required TResult Function() runner,
+  }) {
+    return $default(name, age, books, students);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String name, int age, List<String> books, List<Student> students)?
+        $default, {
+    TResult? Function()? runner,
+  }) {
+    return $default?.call(name, age, books, students);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String name, int age, List<String> books, List<Student> students)?
+        $default, {
+    TResult Function()? runner,
+    required TResult orElse(),
+  }) {
+    if ($default != null) {
+      return $default(name, age, books, students);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_Person value) $default, {
+    required TResult Function(_Runner value) runner,
+  }) {
+    return $default(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_Person value)? $default, {
+    TResult? Function(_Runner value)? runner,
+  }) {
+    return $default?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_Person value)? $default, {
+    TResult Function(_Runner value)? runner,
+    required TResult orElse(),
+  }) {
+    if ($default != null) {
+      return $default(this);
+    }
+    return orElse();
+  }
+
+  @override
   Map<String, dynamic> toJson() {
     return _$$PersonImplToJson(
       this,
@@ -208,18 +296,146 @@ abstract class _Person extends Person {
 
   factory _Person.fromJson(Map<String, dynamic> json) = _$PersonImpl.fromJson;
 
-  @override
   String get name;
-  @override
   int get age;
-  @override
   List<String> get books;
-  @override
   List<Student> get students;
-  @override
   @JsonKey(ignore: true)
   _$$PersonImplCopyWith<_$PersonImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$RunnerImplCopyWith<$Res> {
+  factory _$$RunnerImplCopyWith(
+          _$RunnerImpl value, $Res Function(_$RunnerImpl) then) =
+      __$$RunnerImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$RunnerImplCopyWithImpl<$Res>
+    extends _$PersonCopyWithImpl<$Res, _$RunnerImpl>
+    implements _$$RunnerImplCopyWith<$Res> {
+  __$$RunnerImplCopyWithImpl(
+      _$RunnerImpl _value, $Res Function(_$RunnerImpl) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$RunnerImpl extends _Runner with DiagnosticableTreeMixin {
+  _$RunnerImpl({final String? $type})
+      : $type = $type ?? 'runner',
+        super._();
+
+  factory _$RunnerImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RunnerImplFromJson(json);
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'Person.runner()';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty('type', 'Person.runner'));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$RunnerImpl);
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String name, int age, List<String> books, List<Student> students)
+        $default, {
+    required TResult Function() runner,
+  }) {
+    return runner();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String name, int age, List<String> books, List<Student> students)?
+        $default, {
+    TResult? Function()? runner,
+  }) {
+    return runner?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String name, int age, List<String> books, List<Student> students)?
+        $default, {
+    TResult Function()? runner,
+    required TResult orElse(),
+  }) {
+    if (runner != null) {
+      return runner();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_Person value) $default, {
+    required TResult Function(_Runner value) runner,
+  }) {
+    return runner(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_Person value)? $default, {
+    TResult? Function(_Runner value)? runner,
+  }) {
+    return runner?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_Person value)? $default, {
+    TResult Function(_Runner value)? runner,
+    required TResult orElse(),
+  }) {
+    if (runner != null) {
+      return runner(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$RunnerImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _Runner extends Person {
+  factory _Runner() = _$RunnerImpl;
+  _Runner._() : super._();
+
+  factory _Runner.fromJson(Map<String, dynamic> json) = _$RunnerImpl.fromJson;
 }
 
 Student _$StudentFromJson(Map<String, dynamic> json) {
@@ -1127,4 +1343,178 @@ abstract class MyModelData implements MyModel {
   @JsonKey(ignore: true)
   _$$MyModelDataImplCopyWith<_$MyModelDataImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+Animal _$AnimalFromJson(Map<String, dynamic> json) {
+  return _Initialize.fromJson(json);
+}
+
+/// @nodoc
+mixin _$Animal {
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() Initialize,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? Initialize,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? Initialize,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initialize value) Initialize,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initialize value)? Initialize,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initialize value)? Initialize,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $AnimalCopyWith<$Res> {
+  factory $AnimalCopyWith(Animal value, $Res Function(Animal) then) =
+      _$AnimalCopyWithImpl<$Res, Animal>;
+}
+
+/// @nodoc
+class _$AnimalCopyWithImpl<$Res, $Val extends Animal>
+    implements $AnimalCopyWith<$Res> {
+  _$AnimalCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+}
+
+/// @nodoc
+abstract class _$$InitializeImplCopyWith<$Res> {
+  factory _$$InitializeImplCopyWith(
+          _$InitializeImpl value, $Res Function(_$InitializeImpl) then) =
+      __$$InitializeImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$InitializeImplCopyWithImpl<$Res>
+    extends _$AnimalCopyWithImpl<$Res, _$InitializeImpl>
+    implements _$$InitializeImplCopyWith<$Res> {
+  __$$InitializeImplCopyWithImpl(
+      _$InitializeImpl _value, $Res Function(_$InitializeImpl) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$InitializeImpl with DiagnosticableTreeMixin implements _Initialize {
+  const _$InitializeImpl();
+
+  factory _$InitializeImpl.fromJson(Map<String, dynamic> json) =>
+      _$$InitializeImplFromJson(json);
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'Animal.Initialize()';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty('type', 'Animal.Initialize'));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$InitializeImpl);
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() Initialize,
+  }) {
+    return Initialize();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? Initialize,
+  }) {
+    return Initialize?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? Initialize,
+    required TResult orElse(),
+  }) {
+    if (Initialize != null) {
+      return Initialize();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initialize value) Initialize,
+  }) {
+    return Initialize(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initialize value)? Initialize,
+  }) {
+    return Initialize?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initialize value)? Initialize,
+    required TResult orElse(),
+  }) {
+    if (Initialize != null) {
+      return Initialize(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$InitializeImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _Initialize implements Animal {
+  const factory _Initialize() = _$InitializeImpl;
+
+  factory _Initialize.fromJson(Map<String, dynamic> json) =
+      _$InitializeImpl.fromJson;
 }

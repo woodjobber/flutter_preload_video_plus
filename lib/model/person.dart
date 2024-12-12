@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 part 'person.freezed.dart';
 part 'person.g.dart';
 
-@Freezed(makeCollectionsUnmodifiable: false)
+@Freezed(makeCollectionsUnmodifiable: false, map: FreezedMapOptions())
 class Person with _$Person {
   @Assert('name.isNotEmpty', 'name cannot be empty')
   @Assert('age>=0', 'age cannot < 0')
@@ -19,6 +19,7 @@ class Person with _$Person {
     required List<Student> students,
   }) = _Person;
   Person._();
+  factory Person.runner() = _Runner;
   factory Person.fromJson(Map<String, Object?> json) => _$PersonFromJson(json);
 
   void method() {}
@@ -57,7 +58,7 @@ base class A {
   void a() {}
 }
 
-/// 必须标记： sealed or final or base
+/// 子类必须标记： sealed or final or base
 sealed class A1 extends A {}
 
 /// 类修饰符 interface
@@ -81,7 +82,7 @@ final class C {}
 sealed class D {
   // 必须得有一个 构造函数，子类才能被实例化 否则，no generative constructors (没有 生成构造函数 Generative constructors)
   // 验证： 注释掉 D._()，看D2提示错误信息
-  // 构造器类型：Generative,Default（是一个生成构造器且没有参数和名称）,Named,Constant,Factory,Redirecting.
+  // 构造器类型：Generative,Default（是一个生成构造器且没有参数和名称）,Named,Constant,Factory,Redirecting等构造器.
   D._();
   factory D() = D1;
 }
@@ -90,4 +91,18 @@ class D1 implements D {}
 
 class D2 extends D {
   D2() : super._();
+}
+
+class Single {
+  Single._();
+  static Single? _single;
+  static Single share() => _single ??= Single._();
+  factory Single() => Single.share();
+  static Single get instance => Single.share();
+}
+
+@freezed
+class Animal with _$Animal {
+  const factory Animal.Initialize() = _Initialize;
+  factory Animal.fromJson(Map<String, Object?> json) => _$AnimalFromJson(json);
 }

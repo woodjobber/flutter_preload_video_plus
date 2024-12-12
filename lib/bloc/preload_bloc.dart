@@ -8,6 +8,7 @@ import 'package:cached_chewie_plus/cached_chewie_plus.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_preload_videos/bloc/preload_controller_item.dart';
+import 'package:flutter_preload_videos/model/person.dart';
 import 'package:flutter_preload_videos/service/api_service.dart';
 import 'package:flutter_preload_videos/core/constants.dart';
 import 'package:flutter_preload_videos/main.dart';
@@ -317,7 +318,7 @@ class CounterBloc extends Bloc<CounterEvent, int> {
   }
 }
 
-abstract class StaticCls {
+class StaticCls {
   static StaticCls init() {
     return StaticClsImp();
   }

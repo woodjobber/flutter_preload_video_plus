@@ -13,6 +13,7 @@ _$PersonImpl _$$PersonImplFromJson(Map<String, dynamic> json) => _$PersonImpl(
       students: (json['students'] as List<dynamic>)
           .map((e) => Student.fromJson(e as Map<String, dynamic>))
           .toList(),
+      $type: json['runtimeType'] as String?,
     );
 
 Map<String, dynamic> _$$PersonImplToJson(_$PersonImpl instance) =>
@@ -21,6 +22,16 @@ Map<String, dynamic> _$$PersonImplToJson(_$PersonImpl instance) =>
       'age': instance.age,
       'books': instance.books,
       'students': instance.students,
+      'runtimeType': instance.$type,
+    };
+
+_$RunnerImpl _$$RunnerImplFromJson(Map<String, dynamic> json) => _$RunnerImpl(
+      $type: json['runtimeType'] as String?,
+    );
+
+Map<String, dynamic> _$$RunnerImplToJson(_$RunnerImpl instance) =>
+    <String, dynamic>{
+      'runtimeType': instance.$type,
     };
 
 _$StudentImpl _$$StudentImplFromJson(Map<String, dynamic> json) =>
@@ -86,3 +97,9 @@ Map<String, dynamic> _$$MyModelDataImplToJson(_$MyModelDataImpl instance) =>
     <String, dynamic>{
       'myResponse': const PersonResponseConverter().toJson(instance.myResponse),
     };
+
+_$InitializeImpl _$$InitializeImplFromJson(Map<String, dynamic> json) =>
+    _$InitializeImpl();
+
+Map<String, dynamic> _$$InitializeImplToJson(_$InitializeImpl instance) =>
+    <String, dynamic>{};
